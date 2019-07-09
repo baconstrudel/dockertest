@@ -1,7 +1,6 @@
 FROM golang:alpine AS build-env
 ADD . /go/src/github.com/baconstrudel/dockertest
 WORKDIR /go/src/github.com/baconstrudel/dockertest
-RUN ls -al
 RUN go build -o dockertest
 
 # final stage

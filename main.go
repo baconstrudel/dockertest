@@ -7,11 +7,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func helloWorldHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(200)
-	w.Write([]byte("Hello World!"))
-}
-
 func echoHandler(w http.ResponseWriter, r *http.Request) {
 	lr := io.LimitReader(r.Body, 1024*1024)
 	w.WriteHeader(201)
@@ -22,7 +17,7 @@ func rootHandler(l logrus.FieldLogger) func(w http.ResponseWriter, r *http.Reque
 	return func(w http.ResponseWriter, r *http.Request) {
 		l.WithFields(logrus.Fields{
 			"method":     r.Method,
-			"URL":        r.RequestURI,
+			"URI":        r.RequestURI,
 			"Protocol":   r.Proto,
 			"RemoteAddr": r.RemoteAddr,
 		}).Info("Incoming Request")
@@ -30,14 +25,24 @@ func rootHandler(l logrus.FieldLogger) func(w http.ResponseWriter, r *http.Reque
 		case "POST":
 			echoHandler(w, r)
 		default:
-			helloWorldHandler(w, r)
+			switch {
+			case r.RequestURI == "/version":
+				w.Write([]byte("latest"))
+			case r.RequestURI == "/health-check":
+				w.Write([]byte("ok"))
+			case r.RequestURI == "/ready":
+				w.Write([]byte("I was born ready"))
+			default:
+				w.Write([]byte("Hello World!"))
+			}
 		}
 	}
 }
 
 func main() {
 	l := logrus.StandardLogger()
+	l.SetLevel(logrus.DebugLevel)
 	l.Debug("Logger started.")
 	http.HandleFunc("/", rootHandler(l))
-	l.Info(http.ListenAndServe(":8080", nil))
+	l.Info(http.ListenAndServe("0.0.0.0:8080", nil))
 }
