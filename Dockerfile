@@ -7,5 +7,4 @@ RUN go build -o dockertest
 FROM alpine
 WORKDIR /app
 COPY --from=build-env /go/src/github.com/baconstrudel/dockertest/dockertest /app/
-EXPOSE 80
 ENTRYPOINT ./dockertest
