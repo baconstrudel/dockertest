@@ -44,5 +44,5 @@ func main() {
 	l.SetLevel(logrus.DebugLevel)
 	l.Debug("Logger started.")
 	http.HandleFunc("/", rootHandler(l))
-	l.Info(http.ListenAndServe("0.0.0.0:80", nil))
+	l.Info(http.ListenAndServe("0.0.0.0:8080", nil))
 }
